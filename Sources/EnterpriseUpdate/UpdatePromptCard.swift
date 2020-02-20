@@ -18,11 +18,13 @@ struct UpdatePromptCard: View {
                 .bold()
                 .font(.largeTitle)
                 .padding(.bottom)
+                .foregroundColor(.black)
 
 
             Text(detailText)
                 .font(.body)
                 .padding(.bottom)
+                .foregroundColor(.black)
 
             releaseNotes.map({ rl in
                 VStack {
@@ -30,7 +32,9 @@ struct UpdatePromptCard: View {
                         .bold()
                         .font(.callout)
                         .padding(.bottom, 5)
+                        .foregroundColor(.black)
                     Text(rl)
+                        .foregroundColor(.black)
                 }
             })
 
@@ -40,19 +44,22 @@ struct UpdatePromptCard: View {
                 }) {
                     Text("Remind me Later")
                         .bold()
-                }.buttonStyle(PromptButtonStyle(color: Color(UIColor.systemRed)))
+                }.buttonStyle(PromptButtonStyle(color: Color(UIColor.systemRed))).cornerRadius(10)
 
                 Button(action: {
                     self.updateNowCallback.map({ $0() })
                 }) {
                     Text("Update Now")
                         .bold()
-                }.buttonStyle(PromptButtonStyle(color: Color(UIColor.systemBlue)))
+                    }.buttonStyle(PromptButtonStyle(color: Color(UIColor.systemBlue))).cornerRadius(10)
             }.padding(.top)
 
         }
         .padding(.all)
         .frame(maxWidth: 420)
+        .background(Color.white)
+        .cornerRadius(20)
+
     }
 }
 

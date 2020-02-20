@@ -6,11 +6,11 @@ struct PromptButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
-            .frame(minWidth: 0, maxWidth: .infinity)
+            .scaledToFill()
             .padding()
-            .foregroundColor(.white)
             .background(color)
-            .cornerRadius(40)
-            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .foregroundColor(.white)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+
     }
 }

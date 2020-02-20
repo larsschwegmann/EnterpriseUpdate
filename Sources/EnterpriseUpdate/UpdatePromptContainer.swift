@@ -1,6 +1,13 @@
 import Foundation
 import SwiftUI
 
+//extension AnyTransition {
+//    static var moveAndScale: AnyTransition {
+//        let insertion = AnyTransition.move(edge: .top).combined(with: .scale(scale: 1.0))
+//        return .asymmetric(insertion: <#T##AnyTransition#>, removal: <#T##AnyTransition#>)
+//    }
+//}
+
 struct UpdatePromptContainer: View {
     let title: String
     let detailText: String
@@ -22,8 +29,8 @@ struct UpdatePromptContainer: View {
                              updateButtonText: updateButtonText,
                              remindLaterButtonText: remindLaterButtonText,
                              updateNowCallback: updateNowCallback,
-                             remindMeLaterCallback: remindMeLaterCallback)
-        }
+                remindMeLaterCallback: remindMeLaterCallback).shadow(radius: 20)
+            }.edgesIgnoringSafeArea(.all)
     }
 }
 
