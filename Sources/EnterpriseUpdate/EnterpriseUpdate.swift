@@ -176,7 +176,7 @@ public class EnterpriseUpdate {
             }
         }
         self.timer = Timer.scheduledTimer(withTimeInterval: config.feedUpdateInterval, repeats: true, block: timerBlock)
-        timerBlock(nil)
+        self.checkForUpdates()
     }
 
     public func stopAutoUpdateChecks() {
