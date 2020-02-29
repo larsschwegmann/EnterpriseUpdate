@@ -30,28 +30,25 @@ public class EnterpriseUpdate {
     public struct Configuration {
         // Basic Config
         /// URL of the Feed that contains the version information
-        let feedURL: URL
+        public let feedURL: URL
         // Decoder to decode the update feed
-        let feedDecoder: JSONDecoder
+        public let feedDecoder: JSONDecoder
         /// Time Interval at which automatic checks are performed. Defaults to 1h.
-        var feedUpdateInterval = TimeInterval(60 * 60)
-        /// Flag that indicates if EnterpriseUpdate should check for updates automatically every `feedUpdateInterval` seconds
-        var checkFeedAutomatically: Bool = true
-        var currentVersion = Version(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String) ?? Version(0, 0, 0)
+        public var feedUpdateInterval = TimeInterval(60 * 60)
+        public var currentVersion = Version(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String) ?? Version(0, 0, 0)
 
 
         // UI Settings
-        var alertTitle = "Update available"
-        var alertDetailTextProvider: ((_ oldVersion: Version, _ newVersion: Version, _ displayName: String) -> String) = { (old, new, name) in
+        public var alertTitle = "Update available"
+        public var alertDetailTextProvider: ((_ oldVersion: Version, _ newVersion: Version, _ displayName: String) -> String) = { (old, new, name) in
             return "Version \(new) of \(name) is available. You have Version \(old). Would you like to update now?"
         }
-        var installUpdateButtonText = "Install Update"
-        var remindLaterButtonText = "Remind me Later"
-        var releaseNotesTitleProvider: ((_ oldVersion: Version, _ newVersion: Version, _ displayName: String) -> String) = { (old, new, name) in
+        public var installUpdateButtonText = "Install Update"
+        public var remindLaterButtonText = "Remind me Later"
+        public var releaseNotesTitleProvider: ((_ oldVersion: Version, _ newVersion: Version, _ displayName: String) -> String) = { (old, new, name) in
             return "New in Version \(new):"
         }
-        var appDisplayName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
-        var remindLaterInterval = TimeInterval(60 * 60 * 24)
+        public var appDisplayName = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as! String
 
         // MARK: Initializer
 
@@ -110,7 +107,7 @@ public class EnterpriseUpdate {
 
     // MARK: - Static Properties
 
-    private static let oslog = OSLog(subsystem: "EnterpriseUpdate", category: "Checker")
+    private static let oslog = OSLog(subsystem: "EnterpriseUpdate", category: "EenterpriseUpdate")
 
     // MARK: - Properties
 
@@ -132,11 +129,14 @@ public class EnterpriseUpdate {
 
     public static func setup(_ config: Configuration) {
         EnterpriseUpdate.config = config
+        os_log(.info,
+               log: EnterpriseUpdate.oslog,
+               "EnterpriseUpdate setup!")
     }
 
     // MARK: - Public functions
 
-    public func checkForUpdates() {
+    public func checkForUpdates(autoCheck: Bool = true) {
         self.updateCancellable = URLSession.shared.dataTaskPublisher(for: self.config.feedURL)
             .tryMap({ data, response in
                 guard let httpResponse = response as? HTTPURLResponse else {
@@ -160,7 +160,7 @@ public class EnterpriseUpdate {
                     break
                 }
             }) { feed in
-                self.processFeed(feed)
+                self.processFeed(feed, autoCheck: autoCheck)
         }
     }
 
@@ -186,7 +186,7 @@ public class EnterpriseUpdate {
 
     // MARK: - Private functions
 
-    private func processFeed(_ feed: [FeedItem]) {
+    private func processFeed(_ feed: [FeedItem], autoCheck: Bool) {
         guard !feed.isEmpty else {
             return
         }
@@ -195,6 +195,21 @@ public class EnterpriseUpdate {
         let currentVersion = config.currentVersion
 
         guard currentVersion < latestFeedItem.version else {
+            os_log(.info,
+                   log: EnterpriseUpdate.oslog,
+                   "No update found, latest version is %@",
+                   latestFeedItem.version.description)
+            if !autoCheck {
+                // Display alert
+                DispatchQueue.main.async {
+                    let viewController = UIApplication.topmostViewController()
+                    let alert = UIAlertController(title: "No Update available",
+                                                  message: "You are already running the newest version of \(self.config.appDisplayName)",
+                        preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                    viewController?.present(alert, animated: true, completion: nil)
+                }
+            }
             return
         }
 
