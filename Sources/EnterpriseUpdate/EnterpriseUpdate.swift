@@ -107,7 +107,7 @@ public class EnterpriseUpdate {
 
     // MARK: - Static Properties
 
-    private static let oslog = OSLog(subsystem: "EnterpriseUpdate", category: "EenterpriseUpdate")
+    private static let oslog = OSLog(subsystem: "EnterpriseUpdate", category: "EnterpriseUpdate")
 
     // MARK: - Properties
 
